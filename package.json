@@ -3,9 +3,9 @@
 	"version": "1.0.0",
 	"description": "A mini project to count how many times your site has been visited",
 	"main": "server.js",
-    "type": "module",
+	"type": "module",
 	"scripts": {
-		"start:dev": "nodemon server.js"
+		"start:dev": "node server.js"
 	},
 	"author": "Divine Amunega",
 	"license": "ISC",
