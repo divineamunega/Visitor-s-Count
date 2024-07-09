@@ -2,14 +2,16 @@
 	"name": "visit_times",
 	"version": "1.0.0",
 	"description": "A mini project to count how many times your site has been visited",
-	"main": "server.js",
 	"type": "module",
 	"scripts": {
-		"start:dev": "node server.js"
+		"start:dev": "nodemon server.js"
 	},
 	"author": "Divine Amunega",
 	"license": "ISC",
+	"source": "server.js",
+	"main": "dist/main.js",
 	"dependencies": {
-		"express": "^4.19.2"
+		"express": "^4.19.2",
+		"parcel": "^2.12.0"
 	}
 }

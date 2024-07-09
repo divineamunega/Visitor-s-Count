@@ -1,33 +1,71 @@
-import fs from "fs";
 import express from "express";
 
 const app = express();
 
-const jsonStr = fs.readFileSync("./data.json", { encoding: "utf-8" });
-const idArr = JSON.parse(jsonStr);
-
-app.get("/api/:url", (req, res, next) => {
+app.get("/api/:url", async (req, res, next) => {
+	const request = await fetch(
+		"https://api.jsonbin.io/v3/b/668d2d8ae41b4d34e40f5c71"
+	);
+	const respose = await request.json();
+	const idArr = respose.record;
+	console.log(idArr);
 	const url = req.params.url;
-	const obj = idArr.find((obj) => obj.id === url);
-	if (!obj) {
-		idArr.push({
-			id: url,
-			count: 1,
-		});
+	const obj = idArr.filter((obj) => obj.id === url);
 
-		fs.writeFileSync("./data.json", JSON.stringify(idArr));
+	if (!obj.length) {
+		const put = await fetch(
+			"https://api.jsonbin.io/v3/b/668d2d8ae41b4d34e40f5c71",
+			{
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ id: url, count: 1 }),
+			}
+		);
 
+		const putJSon = await put.json();
+		console.log(putJSon);
 		res.status(200).json({
-			id: url,
-			count: 1,
+			id: putJSon.record.id,
+			count: putJSon.record.count,
 		});
+
+		return;
 	}
 
-	obj.count += 1;
-	fs.writeFileSync("./data.json", JSON.stringify(idArr));
+	// TODO
+	const highestObj = obj.reduce(
+		(acc, curr, _, arr) => {
+			if (acc.count > curr.count) {
+				return acc;
+			} else {
+				return curr;
+			}
+		},
+		{ count: 0 }
+	);
+
+	highestObj.count += 1;
+
+	const put = await fetch(
+		"https://api.jsonbin.io/v3/b/668d2d8ae41b4d34e40f5c71",
+		{
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(highestObj),
+		}
+	);
+
+	const putJSon = await put.json();
 	res.status(200).json({
-		...obj,
+		id: putJSon.record.id,
+		count: putJSon.record.count,
 	});
+
+	return 0;
 });
 
 app.use("*", (req, res, next) => {
